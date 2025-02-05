@@ -18,4 +18,4 @@ class Lote(ModelBase):
     quantidade: int = sa.Column(sa.Integer, nullable=False)
 
     def __repr__(self) -> str:
-        return f"<Lote(nome='{self.id}')>" 
+        return f"<Lote(nome='{self.id}'), data_criacao='{self.data_criacao}', id_tipo_picole='{self.id_tipo_picole}', quantidade='{self.quantidade}'>" 

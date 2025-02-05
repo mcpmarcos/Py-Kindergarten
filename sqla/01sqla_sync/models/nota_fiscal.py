@@ -25,7 +25,6 @@ class NotaFiscal(ModelBase):
 
     id: int = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
     data_criacao: datetime = sa.Column(sa.DateTime, default=datetime.now)
-    descricao: str = sa.Column(sa.String(45), nullable=False)
     descricao: str = sa.Column(sa.String(200), nullable=False)
     valor: float = sa.Column(sa.DECIMAL(8,2), nullable=False)
     numero_serie: str = sa.Column(sa.String(45), unique=True, nullable=False)

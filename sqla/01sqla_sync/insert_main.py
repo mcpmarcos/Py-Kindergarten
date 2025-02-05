@@ -1,3 +1,5 @@
+
+# insert pt 1
 from conf.db_session import create_session
 from models.aditivo_nutritivo import AditivoNutritivo
 from models.sabor import Sabor
@@ -6,6 +8,12 @@ from models.tipo_picole import TipoPicole
 from models.ingrediente import Ingrediente
 from models.conservante import Conservante
 from models.revendedor import Revendedor
+
+# insert pt 2
+from models.lote import Lote
+from models.nota_fiscal import NotaFiscal
+from models.picole import Picole
+
 
 
 # 1 Aditivo Nutritivo
@@ -137,7 +145,40 @@ def insert_revendedor() -> Revendedor:
         session.commit()
 
     return revendedor
+
+
+# 8 lote
+def insert_lote() -> Lote:
+    print('Cadastrando lote')
+
+    quantidade:int = input('Informe a quantidade do lote: ')
+    id_tipo_picole:int = input('Informe o ID do tipo de picolé: ')
     
+    lote: Lote = Lote(id_tipo_picole=id_tipo_picole, quantidade=quantidade)
+
+    with create_session() as session:
+        session.add(lote)
+        session.commit()
+
+    return lote
+
+# 9 nota_fiscal
+def insert_nota_fiscal() -> None:
+    print('Cadastrando nota fiscal')
+
+    valor:float = input('Informe ovalor da nota fiscal: ')
+    numero_serie:str = input('Informe a quantidade do lote: ')
+    id_tipo_picole:int = input('Informe o ID do tipo de picolé: ')
+    
+    nota_fiscal: NotaFiscal = NotaFiscal()
+
+    with create_session() as session:
+        session.add(nota_fiscal)
+        session.commit()
+
+    return nota_fiscal
+
+# 10 picole   
 
 if __name__ == '__main__':
 
@@ -160,5 +201,13 @@ if __name__ == '__main__':
     # insert_conservante()
 
     # 7 revendedor
-    rev = insert_revendedor()
-    print(f'Revendedor {rev} cadastrado com sucesso!')
+    # rev = insert_revendedor()
+    # print(f'Revendedor {rev} cadastrado com sucesso!')
+
+    # 8 lote
+    # lote = insert_lote()
+    # print(f'Lote {lote} cadastrado com sucesso!')
+
+    # 9 nota_fiscal
+
+    # 10 picole   
