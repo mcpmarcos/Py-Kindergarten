@@ -64,4 +64,6 @@ class Picole(ModelBase):
     aditivos_nutritivos: Mapped[Optional[List[AditivoNutritivo]]] = orm.relationship("AditivoNutritivo", secondary=aditivos_nutritivos_picole, backref="aditivos_nutritivos", lazy="joined")
 
     def __repr__(self) -> str:
-        return f"<Picolé(nome='{self.tipo_picole.nome} com sabor {self.sabor.nome} e preço {self.preco}')>"
+        sabor_nome = self.sabor.nome if self.sabor else "Desconhecido"
+    
+        return f"<Picolé(sabor = {self.sabor.nome} e preço {self.preco}')>"

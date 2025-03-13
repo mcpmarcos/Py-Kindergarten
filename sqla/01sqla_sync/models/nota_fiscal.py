@@ -36,4 +36,6 @@ class NotaFiscal(ModelBase):
     lotes: Mapped[List[Lote]] = orm.relationship("Lote", secondary=lotes_nota_fiscal, backref="lotes", lazy="dynamic")
 
     def __repr__(self) -> str:
-        return f"<Nota Fiscal(nome='{self.numero_serie}')>"
+        razao_social = self.revendedor.razao_social if self.revendedor else "Desconhecido"
+        
+        return f"<Nota Fiscal(nome='{self.numero_serie}', valor='{self.valor}', data_criacao='{self.data_criacao}', descricao='{self.descricao}', id_revendedor='{self.id_revendedor}', razao_social='{self.revendedor.razao_social}')>"
