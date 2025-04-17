@@ -1,4 +1,7 @@
 
+import asyncio
+
+
 # insert pt 1
 from conf.db_session import create_session
 from models.aditivo_nutritivo import AditivoNutritivo
@@ -17,7 +20,7 @@ from models.picole import Picole
 
 
 # 1 Aditivo Nutritivo
-def insert_aditivo_nutritivo() -> AditivoNutritivo:
+async def insert_aditivo_nutritivo() -> AditivoNutritivo:
     print('Cadastrando aditivo nutritivo')
 
     nome:str = input('Informe o nome do aditivo nutritivo: ')
@@ -26,9 +29,9 @@ def insert_aditivo_nutritivo() -> AditivoNutritivo:
 
     an: AditivoNutritivo = AditivoNutritivo(nome=nome, formula_quimica=formula_quimica)
 
-    with create_session() as session:
+    async with create_session() as session:
         session.add(an)
-        session.commit()
+        await session.commit()
 
     print(f'Aditivo Nutritivo {an.nome} cadastrado com sucesso!')
     print(f'ID do aditivo nutritivo: {an.id}')
@@ -236,7 +239,11 @@ def insert_picole() -> None:
 if __name__ == '__main__':
 
     # 1 Aditivo Nutritivo
-    #insert_aditivo_nutritivo()
+    # print('Cadastrando aditivo nutritivo')
+    # print(asyncio.run(insert_aditivo_nutritivo()))
+    # print('------------------------------')
+
+    asyncio.run(insert_aditivo_nutritivo())
 
     # 2 Sabor
     # insert_sabor() 
@@ -271,3 +278,5 @@ if __name__ == '__main__':
     # print(f'Picolé {picole} cadastrado com sucesso!')  
 
     ...
+
+ 

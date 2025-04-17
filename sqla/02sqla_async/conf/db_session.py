@@ -1,61 +1,65 @@
-import sqlalchemy as sa
+from pathlib import Path #Usado apenascasoo bancos ejsqlte 
 
+from typing import Optional
 from sqlalchemy.orm import sessionmaker
 
-from pathlib import Path #Usado apenascasoo bancos ejsqlte 
-from typing import Optional
+# principais importações que determinam se a utilização da orm e do banco de dados será síncrona ou assíncrona
 
-from sqlalchemy.orm import Session
-from sqlalchemy.future.engine import Engine
-
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import create_async_engine
+ 
 from models.model_base import ModelBase
 
-__engine: Optional[Engine] = None
+__async_engine: Optional[AsyncEngine] = None
+
 
 # Função para configurar a conexão como Banco de dados
-def create_engine(sqlite: bool = False) -> Engine:
+def create_engine(sqlite: bool = False) -> AsyncEngine:
 
-    global __engine
+    global __async_engine
 
-    if __engine:
-      return
-
+    if __async_engine:
+        return __async_engine
+    
     if sqlite:
-        arquivo_db = "db/picole.sqlite"
+        arquivo_db = 'db/picoles-async-refactor.sqlite'
         folder = Path(arquivo_db).parent
         folder.mkdir(parents=True, exist_ok=True)
 
-        conn_str = f'sqlite:///{arquivo_db}'
-        __engine = sa.create_engine(url=conn_str, echo=False, connect_args={"check_same_thread": False})
-
+        conn_str = f'sqlite+aiosqlite:///{arquivo_db}'
+        __async_engine = create_async_engine(url=conn_str, echo=False, future=True, connect_args={"check_same_thread": False})
     else:
-        conn_str = 'postgresql://postgres:123456@localhost:5432/picoles'
-        __engine = sa.create_engine(url=conn_str, echo=False)
- 
-    return __engine
+        conn_str = 'postgresql+asyncpg://postgres:123456@localhost:5432/picoles-async-refactor'
+        __async_engine = create_async_engine(url=conn_str, echo=False)
+    return __async_engine 
+
 
 
 # Função para criar uma sessão de conexão com o banco de dados
-def create_session() -> Session:
-    global __engine
+def create_session() -> AsyncSession:
+
+    global __async_engine
+
+    if not __async_engine:
+        create_engine()
+    __async_session: AsyncSession = sessionmaker(
+        __async_engine, 
+        expire_on_commit=False, 
+        class_=AsyncSession
+        )
+    session: AsyncSession = __async_session()
+    return session 
 
 
-    if not __engine:
-        create_engine()                 # caso o banco seja o postgresql
-        # create_engine(sqlite=True)    # caso o banco seja o sqlite
-    __session = sessionmaker(__engine, expire_on_commit=False, class_=Session)
+async def create_tables() -> None:
     
-    session: Session = __session()
-    
-    return session
+    global __async_engine
 
+    if not __async_engine:
+        create_engine()
 
-def create_tables() -> None:
-    global __engine
-
-    if not __engine:
-        create_engine()                  # caso o banco seja o postgresql
-        # create_engine(sqlite=True)     # caso o banco seja o sqlite
     import models.__all_models
-    ModelBase.metadata.drop_all(__engine) 
-    ModelBase.metadata.create_all(__engine) 
+    async with __async_engine.begin() as conn:
+        await conn.run_sync(ModelBase.metadata.drop_all) 
+        await conn.run_sync(ModelBase.metadata.create_all)
