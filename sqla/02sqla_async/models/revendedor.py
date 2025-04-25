@@ -14,4 +14,4 @@ class Revendedor(ModelBase):
    
 
     def __repr__(self) -> str:
-        return f"<Revendedor(cnpj='{self.cnpj}', )>" 
+        return f"<Revendedor(cnpj='{self.cnpj}')>" 
