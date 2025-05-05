@@ -41,6 +41,7 @@ async def insert_aditivo_nutritivo() -> AditivoNutritivo:
 
     return an
 
+
 # 2 Sabor
 async def insert_sabor() -> None:
     print('Cadastrando sabor')
@@ -98,6 +99,7 @@ async def insert_tipo_picole() -> None:
     print(f'ID do tipo de picolé: {tipo_picole.id}')
 
     print(f'Data de criaçãodo do tipode picolé: {tipo_picole.data_criacao}')
+
 
 # 5 ingredientes
 async def insert_ingrediente() -> Ingrediente:
@@ -175,6 +177,7 @@ async def insert_lote() -> Lote:
 
     return lote
 
+
 # 9 nota_fiscal
 async def insert_nota_fiscal() -> None:
     print('Cadastrando nota fiscal')
@@ -202,6 +205,7 @@ async def insert_nota_fiscal() -> None:
 
 
     return nota_fiscal
+
 
 # 10 picole   
 async def insert_picole() -> None:
@@ -274,12 +278,11 @@ if __name__ == '__main__':
     # print(f'Lote {lote} cadastrado com sucesso!')
 
     # 9 nota_fiscal
-    nf = asyncio.run(insert_nota_fiscal())
-    print(f'Nota fiscal {nf}cadastrada com sucesso!')
+    # nf = asyncio.run(insert_nota_fiscal())
+    # print(f'Nota fiscal {nf}cadastrada com sucesso!')
 
     # 10 picole
     # picole = asyncio.run(insert_picole()) 
     # print(f'Picolé {picole}cadastrado com sucesso!')  
-    
 
- 
+    ...       

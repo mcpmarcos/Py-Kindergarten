@@ -5,32 +5,20 @@ from conf.db_session import create_session
 from models.revendedor import Revendedor
 from models.picole import Picole
 
+import asyncio
+from sqlalchemy.future import select
 
 # Buscar registro no banco
 # Deletar o registro encontrado
 # Registrar no banco a deleção do registro
 
 
-def deletar_picole(id_picole: int) -> None:
-    with create_session() as session:
+async def select_filtro_revendedor(id_revendedor: int) -> None:
+    async with create_session() as session:
         
-        # Buscar registro no banco
-        picole: Optional[Picole] = session.query(Picole).filter(Picole.id == id_picole).one_or_none()
-        
-        if picole:
-            # Deletar o registro encontrado
-            session.delete(picole)
-            # Registrar no banco a deleção do registro
-            session.commit()
-            print(f'Picolé {picole.id} deletado com sucesso.')
-        else:
-            print(f"Picolé {picole.id} não encontrado.")
-
-
-def select_filtro_revendedor(id_revendedor: int) -> None:
-    with create_session() as session:
-        
-        revendedor: Optional[Revendedor] = session.query(Revendedor).filter(Revendedor.id == id_revendedor).one_or_none()
+        query = select(Revendedor).filter(Revendedor.id == id_revendedor)
+        result = await session.execute(query)
+        revendedor: Optional[Revendedor] = result.scalars().unique().one_or_none()
 
         if revendedor:
             print(f"ID: {revendedor.id}")
@@ -40,15 +28,33 @@ def select_filtro_revendedor(id_revendedor: int) -> None:
             print(f"Não foi encontrado nenhum revendedor com id {id_revendedor}")
             print("----------------------------------------")
 
-
-def deletar_revendedor(id_revendedor: int) -> None:
-    with create_session() as session:
+async def deletar_picole(id_picole: int) -> None:
+    async with create_session() as session:
         
-        revendedor: Optional[Revendedor] = session.query(Revendedor).filter(Revendedor.id == id_revendedor).one_or_none()
+        # Buscar registro no banco
+        query = select(Picole).filter(Picole.id == id_picole)
+        result = await session.execute(query)
+        picole: Optional[Picole] = result.scalars().unique().one_or_none()
+        
+        if picole:
+            # Deletar o registro encontrado
+            await session.delete(picole)
+            # Registrar no banco a deleção do registro
+            await session.commit()
+            print(f'Picolé {picole.id} deletado com sucesso.')
+        else:
+            print(f"Picolé {picole.id} não encontrado.")
+
+async def deletar_revendedor(id_revendedor: int) -> None:
+    async with create_session() as session:
+        
+        query = select(Revendedor).filter(Revendedor.id == id_revendedor)
+        result = await session.execute(query)
+        revendedor: Optional[Revendedor] = result.scalars().unique().one_or_none()
 
         if revendedor:
-            session.delete(revendedor)
-            session.commit()
+            await session.delete(revendedor)
+            await session.commit()
             print(f"Revendedor {id_revendedor} deletado com sucesso.")
 
         else:
@@ -56,32 +62,40 @@ def deletar_revendedor(id_revendedor: int) -> None:
             print("----------------------------------------")
         
 
+async def delete_revendedor():
+    
+    # Fazer consulta na tabelade notas fiscais para saber quais IDs de revendedor estão vincularos ou não
+    
+    id_revendedor_vinculado = 6
+    id_revendedor_nao_vinculado = 3
+
+    # await select_filtro_revendedor(id_revendedor_vinculado)
+
+    await deletar_revendedor(id_revendedor_nao_vinculado)
+
+    # await select_filtro_revendedor(id_revendedor_vinculado)
+
+async def delete_picole():
+        
+        from update_main import select_filtro_picole
+
+        id_picole = 22
+    
+        await select_filtro_picole(id_picole)
+    
+        await deletar_picole(id_picole)
+    
+        await select_filtro_picole(id_picole)
 
 if __name__ == "__main__":
-    # from update_main import select_filtro_picole
 
-    # id_picole = 22
-
-    # select_filtro_picole(id_picole)
-
-    # deletar_picole(id_picole)
-
-    # select_filtro_picole(id_picole)
+    asyncio.run(delete_revendedor())
+    # asyncio.run(delete_picole())
 
 #######################################################
 
     # Como a tabela de revendedor está relacionada a de notas, eu só posso deletar um revendedor que não esteja relacionado a uma nota
 
-    # Caso eu tenha tentado deletar um revendedor vinculado a uma nota fiscal, vai dar erro
-
-    
-    id_revendedor_vinculado = 1
-    id_revendedor_nao_vinculado = 2
-
-    select_filtro_revendedor(id_revendedor_vinculado)
-
-    deletar_revendedor(id_revendedor_vinculado)
-
-    select_filtro_revendedor(id_revendedor_vinculado)
+    # Caso eu tenha tentado deletar um revendedor vinculado a uma nota fiscal, vai dar erro   
 
 ######################################################
